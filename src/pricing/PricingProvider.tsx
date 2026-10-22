@@ -1,3 +1,5 @@
+'use client'
+
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import {
   FALLBACK_QUOTE,
@@ -7,7 +9,7 @@ import {
   type RateQuote,
 } from '../lib/exchangeRate'
 import { PricingContext, type PricingContextValue } from './PricingContext'
-import { loadSettings, saveSettings, type Settings } from './settings'
+import { DEFAULT_SETTINGS, loadSettings, saveSettings, type Settings } from './settings'
 
 type RateState =
   | { status: 'loading'; quote: null }
@@ -17,7 +19,9 @@ type RateState =
 const REFRESH_AFTER_MS = 60 * 60 * 1000
 
 export function PricingProvider({ children }: { children: ReactNode }) {
-  const [settings, setSettings] = useState(loadSettings)
+  // サーバーの描画と一致させるため、保存済みの設定は表示後に読み込む
+  const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS)
+  const settingsLoaded = useRef(false)
   const [rateState, setRateState] = useState<RateState>({ status: 'loading', quote: null })
   const [attempt, setAttempt] = useState(0)
   const fetchedAt = useRef(0)
@@ -54,6 +58,17 @@ export function PricingProvider({ children }: { children: ReactNode }) {
   }, [])
 
   useEffect(() => {
+    // localStorage はブラウザでしか読めないので、初回の描画後に反映する
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setSettings(loadSettings())
+  }, [])
+
+  useEffect(() => {
+    // 読み込み前の既定値で、保存済みの設定を上書きしない
+    if (!settingsLoaded.current) {
+      settingsLoaded.current = true
+      return
+    }
     saveSettings(settings)
   }, [settings])
 

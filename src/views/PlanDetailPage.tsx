@@ -1,15 +1,14 @@
+'use client'
+
+import Link from 'next/link'
 import { useId, useState, type ReactNode } from 'react'
-import { Link, useParams } from 'react-router'
 import { CheckIcon } from '../components/icons'
 import { OfficialLink } from '../components/OfficialLink'
 import { PlatformNotice } from '../components/PlatformNotice'
 import { Yen } from '../components/Yen'
-import { Seo } from '../components/Seo'
 import { OFFICIAL_PRICING_URL } from '../config'
-import { pageMetaFor } from '../seo'
 import {
   GROUP_LABEL,
-  findPlan,
   planHighlights,
   plans,
   type BillingCycle,
@@ -27,24 +26,14 @@ import {
   type PricingOptions,
 } from '../lib/pricing'
 import { usePricing } from '../pricing/PricingContext'
-import { NotFoundPage } from './NotFoundPage'
 
-export function PlanDetailPage() {
-  const { planId } = useParams()
-  const plan = findPlan(planId)
-  if (!plan) return <NotFoundPage />
-  return <PlanDetail plan={plan} />
-}
-
-function PlanDetail({ plan }: { plan: Plan }) {
+export function PlanDetailPage({ plan }: { plan: Plan }) {
   return (
     <div className="mx-auto max-w-4xl px-4 py-8 sm:py-12">
-      <Seo meta={pageMetaFor(`/plans/${plan.id}`)} />
-
       <nav aria-label="パンくずリスト" className="text-sm text-stone-500 dark:text-stone-400">
         <ol className="flex flex-wrap gap-2">
           <li>
-            <Link to="/" className="hover:text-stone-900 hover:underline dark:hover:text-white">
+            <Link href="/" className="hover:text-stone-900 hover:underline dark:hover:text-white">
               プラン一覧
             </Link>
           </li>
@@ -153,28 +142,28 @@ function Breakdown({ plan }: { plan: Plan }) {
             {settings.feePercent > 0 && (
               <Row
                 label={`手数料（${settings.feePercent}%）`}
-                cells={columns.map(({ yen }) => (
-                  <Yen value={yen?.fee ?? null} />
+                cells={columns.map(({ yen }, i) => (
+                  <Yen key={i} value={yen?.fee ?? null} />
                 ))}
               />
             )}
             <Row
               label="支払額の目安"
               emphasis
-              cells={columns.map(({ yen }) => (
-                <Yen value={yen?.total ?? null} />
+              cells={columns.map(({ yen }, i) => (
+                <Yen key={i} value={yen?.total ?? null} />
               ))}
             />
             <Row
               label="1か月あたり"
-              cells={columns.map(({ cycle, yen }) => (
-                <Yen value={yen ? yen.total / CYCLE_MONTHS[cycle] : null} />
+              cells={columns.map(({ cycle, yen }, i) => (
+                <Yen key={i} value={yen ? yen.total / CYCLE_MONTHS[cycle] : null} />
               ))}
             />
             <Row
               label="1年あたり"
-              cells={columns.map(({ cycle, yen }) => (
-                <Yen value={yen ? (yen.total * 12) / CYCLE_MONTHS[cycle] : null} />
+              cells={columns.map(({ cycle, yen }, i) => (
+                <Yen key={i} value={yen ? (yen.total * 12) / CYCLE_MONTHS[cycle] : null} />
               ))}
             />
           </tbody>
@@ -337,7 +326,7 @@ function OtherPlans({ currentId }: { currentId: string }) {
           .map((plan) => (
             <li key={plan.id}>
               <Link
-                to={`/plans/${plan.id}`}
+                href={`/plans/${plan.id}`}
                 className="inline-block rounded-full border border-stone-300 px-3 py-1.5 text-sm font-medium hover:border-orange-700 hover:text-orange-700 dark:border-stone-700 dark:hover:border-orange-400 dark:hover:text-orange-400"
               >
                 {plan.name}

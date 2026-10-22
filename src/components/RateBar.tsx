@@ -1,3 +1,5 @@
+'use client'
+
 import { useId, useState, type ReactNode } from 'react'
 import { JCT_NOTICE_URL } from '../config'
 import { MAX_RATE, MIN_RATE, isPlausibleRate, type RateQuote } from '../lib/exchangeRate'

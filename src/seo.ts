@@ -1,13 +1,11 @@
-// ビルド時のスクリプト（scripts/postbuild.mjs）からも読み込むため、
-// このファイルは Node で直接実行できるよう、拡張子つきの import だけを使う。
-import { SITE_NAME } from './config.ts'
-import { findPlan, plans } from './data/plans.ts'
+import { SITE_NAME } from './config'
+import { findPlan, plans } from './data/plans'
 
 export interface PageMeta {
   /** サイト内のパス（例: /plans/pro） */
   path: string
   title: string
-  /** ページの見出し（JavaScript なしで見たときの h1 にも使う） */
+  /** ページの見出し */
   heading: string
   description: string
   /** 検索結果に出したくないページ */

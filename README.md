@@ -18,22 +18,22 @@ Claude Code が使える各プラン（Pro・Max・Team・Enterprise）の料金
 
 | 用途 | 使っているもの |
 |---|---|
-| ビルド | Vite 8 |
+| フレームワーク | Next.js 16（App Router） |
 | UI | React 19 + TypeScript |
-| ルーティング | React Router 8（Data Mode / `createBrowserRouter`） |
+| アクセス解析 | Vercel Web Analytics（`@vercel/analytics/next`） |
 | スタイル | Tailwind CSS 4 |
 | 為替レート | [ExchangeRate-API](https://www.exchangerate-api.com)（失敗時は [Frankfurter](https://frankfurter.dev)） |
 
-Node.js 22.22 以上が必要です（React Router 8 の要件）。
+Node.js 20.9 以上が必要です（Next.js 16 の要件）。
 
 ## 開発
 
 ```bash
 npm install
-npm run dev      # 開発サーバー (http://localhost:5173)
+npm run dev      # 開発サーバー (http://localhost:3000)
 npm run lint     # ESLint
-npm run build    # 型チェック + 本番ビルド + SEO 用ファイルの生成
-npm run preview  # ビルド結果の確認
+npm run build    # 型チェック + 本番ビルド
+npm run start    # ビルド結果の確認
 ```
 
 ## ディレクトリ構成
@@ -42,25 +42,22 @@ npm run preview  # ビルド結果の確認
 src/
 ├── config.ts            サイト名・料金の確認日・公式ページの URL
 ├── data/plans.ts        プランの料金・特徴・申し込み先（料金改定はここを編集）
-├── seo.ts               ページごとの title / description（ビルド時にも使う）
-├── router.ts            ルーティング定義
+├── seo.ts               ページごとの title / description / 構造化データ
+├── app/                 ルーティング（layout・各ページ・404・sitemap・robots）
 ├── lib/
 │   ├── pricing.ts       円換算・消費税・手数料の計算
 │   ├── exchangeRate.ts  為替 API の取得とキャッシュ
 │   ├── format.ts        金額・日時の表示形式
-│   └── head.ts          画面遷移時の <head> 更新
+│   ├── metadata.ts      PageMeta を Next.js の Metadata に変換
+│   └── siteUrl.ts       サイトの URL（SITE_URL）の取得
 ├── pricing/             為替レートと計算条件の Context
 ├── components/          共通コンポーネント
-└── routes/              ページ（一覧・詳細・計算方法・404）
-scripts/postbuild.mjs    ビルド後に各ページの HTML・sitemap・robots.txt を生成
+└── views/               ページの中身（一覧・詳細・計算方法・メッセージ）
 ```
 
 ## 料金を更新するとき
 
-公式サイトで料金が改定されたら、次の 2 か所を編集します。
-
-1. [src/data/plans.ts](src/data/plans.ts) の `priceUsd`（税抜のドル価格。`annual` は年額）
-2. [src/config.ts](src/config.ts) の `PRICES_CHECKED_AT`（確認した日）
+公式サイトで料金が改定されたら、[src/data/plans.ts](src/data/plans.ts) の `priceUsd`（税抜のドル価格。`annual` は年額）を編集します。
 
 公式の料金ページ：<https://claude.com/pricing>（[Team](https://claude.com/pricing/team) / [Enterprise](https://claude.com/pricing/enterprise)）
 
@@ -76,29 +73,17 @@ scripts/postbuild.mjs    ビルド後に各ページの HTML・sitemap・robots.
 ## 本番ビルドと公開
 
 ```bash
-SITE_URL=https://your-domain.example npm run build
+npm run build
+npm run start
 ```
 
-PowerShell の場合：
+ページは `next build` のときに静的な HTML として生成されます（title・description・canonical・OGP・構造化データ入り）。存在しない URL は 404（`noindex`）になり、`/sitemap.xml` と `/robots.txt` も自動で配信されます。
 
-```powershell
-$env:SITE_URL = "https://your-domain.example"; npm run build
-```
-
-`dist/` に次のファイルができます。
-
-| ファイル | 内容 |
-|---|---|
-| `index.html`、`plans/*/index.html`、`about/index.html` | ページごとの HTML（title・description・canonical・OGP・構造化データ入り） |
-| `404.html` | 存在しないパス用（`noindex`） |
-| `sitemap.xml`、`robots.txt` | 検索エンジン向け |
-
-- **`SITE_URL`** は公開するサイトの URL です。canonical・`og:url`・構造化データ・`sitemap.xml` に必要で、指定しない場合はこれらを作りません（警告を表示します）。
-- ページごとに `index.html` を書き出すため、静的ホスティング（Netlify、Cloudflare Pages、GitHub Pages、Vercel など）にそのまま置けます。`404.html` は多くのホスティングが自動で使います。
-- ホスティングによっては、`/plans/pro` のようなパスを `index.html` に返す設定（SPA フォールバック）があると、より確実です。
+- **サイトの URL** は、環境変数 `SITE_URL` で指定します（例: `https://your-domain.example`）。未指定の場合は Vercel が渡す `VERCEL_PROJECT_PRODUCTION_URL` を使い、どちらもなければ canonical・`og:url`・構造化データ・`sitemap.xml` は作りません。
+- **Vercel にデプロイする**場合は、プロジェクトの Framework Preset を **Next.js** にしてください（Vite のままだと `dist` を探して失敗します）。Web Analytics は、Vercel のプロジェクトで有効化して再デプロイすると計測が始まります。
 
 ## 注意事項
 
-- 料金・消費税の扱いは 2026 年 10 月 11 日に公式サイトで確認した内容です。
+- 料金・消費税の扱いは公式サイトで確認した内容です。
 - アプリ内課金（iPhone・iPad・Android）の価格は、このサイトの金額と一致しないことがあります。
 - 日本の利用者には、2026 年 4 月 1 日から 10% の消費税（JCT）が加算されています（[公式のお知らせ](https://support.claude.com/ja/articles/14051822)）。

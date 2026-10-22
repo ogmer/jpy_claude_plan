@@ -1,4 +1,4 @@
-import { Link } from 'react-router'
+import Link from 'next/link'
 
 /** 申し込む媒体によって価格が変わることを伝える注記 */
 export function PlatformNotice({ withLink = false }: { withLink?: boolean }) {
@@ -13,7 +13,7 @@ export function PlatformNotice({ withLink = false }: { withLink?: boolean }) {
       {withLink && (
         <>
           {' '}
-          <Link to="/about#platform" className="font-medium underline underline-offset-2">
+          <Link href="/about#platform" className="font-medium underline underline-offset-2">
             詳しく見る
           </Link>
         </>

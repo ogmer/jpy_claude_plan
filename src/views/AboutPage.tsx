@@ -1,14 +1,10 @@
 import type { ReactNode } from 'react'
 import { OfficialLink } from '../components/OfficialLink'
-import { Seo } from '../components/Seo'
-import { JCT_NOTICE_URL, OFFICIAL_PRICING_URL, PRICES_CHECKED_AT } from '../config'
-import { ABOUT_META } from '../seo'
+import { JCT_NOTICE_URL, OFFICIAL_PRICING_URL } from '../config'
 
 export function AboutPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-10 sm:py-14">
-      <Seo meta={ABOUT_META} />
-
       <h1 className="text-3xl font-bold tracking-tight">計算方法と注意事項</h1>
 
       <Section title="円の金額の計算方法">
@@ -27,8 +23,7 @@ export function AboutPage() {
           ページを開くたびに、ExchangeRate-API が公開しているその日のドル円レート（1日1回更新）を取得して計算します。開いたままのタブも、1時間以上たってから戻ってくると自動で取り直します。
         </p>
         <p>
-          取得できないときは Frankfurter（欧州中央銀行の参照レート）を使います。それも取得できない場合は、前回取得できたレート、それもなければ
-          {PRICES_CHECKED_AT}時点の参考値で計算し、画面上部にその旨を表示します。
+          取得できないときは Frankfurter（欧州中央銀行の参照レート）を使います。それも取得できない場合は、前回取得できたレート、それもなければ参考値で計算し、画面上部にその旨を表示します。
         </p>
         <p>
           実際の請求額は、カード会社が決済を処理した日のレートで決まります。カード会社のレートが分かる場合は、「計算条件を変更」から手動で指定できます。
@@ -71,8 +66,7 @@ export function AboutPage() {
 
       <Section title="料金の出典">
         <p>
-          プランの料金は{PRICES_CHECKED_AT}
-          に公式サイトで確認したものです。料金が改定されている場合があるため、申し込み前に必ず公式サイトで確認してください。
+          プランの料金は公式サイトで確認したものです。料金が改定されている場合があるため、申し込み前に必ず公式サイトで確認してください。
         </p>
         <ul className="list-disc space-y-1 pl-5">
           <li>

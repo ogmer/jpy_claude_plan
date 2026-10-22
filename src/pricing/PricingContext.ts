@@ -1,3 +1,5 @@
+'use client'
+
 import { createContext, use } from 'react'
 import type { RateQuote } from '../lib/exchangeRate'
 import type { PricingOptions } from '../lib/pricing'

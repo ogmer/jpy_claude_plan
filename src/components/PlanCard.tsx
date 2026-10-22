@@ -1,4 +1,6 @@
-import { Link } from 'react-router'
+'use client'
+
+import Link from 'next/link'
 import { planHighlights, type BillingCycle, type Plan } from '../data/plans'
 import { formatUsd, formatYen } from '../lib/format'
 import { CYCLE_MONTHS, CYCLE_UNIT, pickPriceOption, toYen } from '../lib/pricing'
@@ -75,7 +77,7 @@ export function PlanCard({ plan, billing }: PlanCardProps) {
           {plan.signup.label}
         </OfficialLink>
         <Link
-          to={`/plans/${plan.id}`}
+          href={`/plans/${plan.id}`}
           className="inline-flex items-center justify-center gap-1 text-sm font-medium text-stone-700 hover:text-orange-700 dark:text-stone-300 dark:hover:text-orange-400"
         >
           円での内訳を見る
